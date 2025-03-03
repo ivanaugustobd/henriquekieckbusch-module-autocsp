@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/di.xsd">
+    <type name="Magento\Csp\Model\Collector\CspWhitelistXmlCollector">
+        <plugin name="henriquekieckbusch_autocsp_add_policies"
+                type="HenriqueKieckbusch\AutoCSP\Plugin\AddCspPoliciesPlugin"/>
+    </type>
+    <type name="Magento\Framework\View\Result\Page">
+        <plugin name="henriquekieckbusch_autocsp_inline_script_nonce"
+                type="HenriqueKieckbusch\AutoCSP\Plugin\InlineScriptNoncePlugin"/>
+    </type>
+    <type name="Magento\Csp\Model\Mode\ConfigManager">
+        <plugin name="config-manager-plugin"
+                type="HenriqueKieckbusch\AutoCSP\Plugin\ConfigManagerPlugin"
+                sortOrder="999"/>
+    </type>
+</config>

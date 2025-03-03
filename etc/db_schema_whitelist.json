@@ -1,0 +1,17 @@
+{
+    "autocsp_data": {
+        "column": {
+            "entity_id": true,
+            "policy": true,
+            "type": true,
+            "active": true,
+            "data_content": true
+        },
+        "index": {
+            "AUTOCSP_DATA_ACTIVE": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    }
+}

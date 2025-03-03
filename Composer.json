@@ -1,0 +1,18 @@
+{
+  "name": "henriquekieckbusch/module-autocsp",
+  "description": "Automatic CSP Configuration Module for Magento 2",
+  "require": {
+    "magento/framework": "*",
+    "magento/module-csp": "*"
+  },
+  "type": "magento2-module",
+  "version": "1.0.1",
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "HenriqueKieckbusch\\AutoCSP\\": ""
+    }
+  }
+}

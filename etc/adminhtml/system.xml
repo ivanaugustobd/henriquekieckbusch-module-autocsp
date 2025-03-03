@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="security" translate="label" sortOrder="200">
+            <label>Security</label>
+        </tab>
+        <section id="henrique_kieckbusch" translate="label" sortOrder="999" type="text" showInDefault="1"
+                 showInWebsite="1" showInStore="1">
+            <tab>security</tab>
+            <label>Auto CSP</label>
+            <resource>HenriqueKieckbusch_AutoCSP::config</resource>
+            <class>separator-top</class>
+            <group id="autocsp" translate="label" type="text" sortOrder="10"
+                   showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Auto CSP</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="capture" translate="label comment" type="select" sortOrder="20"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Capture Mode</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[⚠️ <b>Important:</b> Keep this CSP mode enabled for a while.
+                    Once you stop seeing CSP
+                    error messages in your browser console, you can disable it. <br/><br/>
+                    Remember to disable this mode on production websites after the warnings disappear!
+                    <br/><b>[Recommended: Yes, perform a few test orders, then switch this setting to "No".]</b>
+                    ]]></comment>
+                </field>
+                <field id="inline_scripts" translate="label comment" type="select" sortOrder="30"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Auto Inline Script CSP</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[If enabled: This setting automatically adds a nonce attribute to inline
+                     `script` tags that are missing it. <br/> <b>[Recommended: Yes]</b>]]></comment>
+                </field>
+            </group>
+            <group id="policies" translate="label" type="text" sortOrder="20"
+                   showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Policies - When Capture Mode enabled, it'll auto-fill it</label>
+
+                <field id="policy_list" translate="label" sortOrder="10"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <backend_model>HenriqueKieckbusch\AutoCSP\Model\System\Config\Backend\Policies</backend_model>
+                    <frontend_model
+                    >HenriqueKieckbusch\AutoCSP\Block\Adminhtml\System\Config\Form\Field\Policy</frontend_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

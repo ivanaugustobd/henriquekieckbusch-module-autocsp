@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="autocsp_data" resource="default" engine="innodb" comment="AutoCSP Data Table">
+        <column xsi:type="int" name="entity_id" nullable="false" identity="true" unsigned="true" comment="ID" />
+        <column xsi:type="varchar" name="policy" nullable="false" length="255" comment="Policy"/>
+        <column xsi:type="varchar" name="type" nullable="true" length="255" comment="Type"/>
+        <column xsi:type="int" name="active" nullable="false" default="1" />
+        <column xsi:type="text" name="data_content" nullable="false" comment="Data Content"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <index referenceId="ACTIVE_AUTOCSP" indexType="btree">
+            <column name="active"/>
+        </index>
+    </table>
+</schema>
