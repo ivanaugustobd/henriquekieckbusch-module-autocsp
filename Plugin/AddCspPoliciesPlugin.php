@@ -3,11 +3,12 @@ declare(strict_types=1);
 
 namespace HenriqueKieckbusch\AutoCSP\Plugin;
 
-use HenriqueKieckbusch\AutoCSP\Model\CspNonceProvider;
+use Magento\Csp\Helper\CspNonceProvider;
 use HenriqueKieckbusch\AutoCSP\Model\ResourceModel\AutocspData\CollectionFactory;
 use Magento\Csp\Model\Collector\CspWhitelistXmlCollector;
 use Magento\Csp\Model\Policy\FetchPolicyFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Psr\Log\LoggerInterface;
 
 class AddCspPoliciesPlugin
@@ -67,6 +68,7 @@ class AddCspPoliciesPlugin
      * @param CspWhitelistXmlCollector $subject
      * @param array $result
      * @return array
+     * @throws LocalizedException
      */
     public function afterCollect(
         CspWhitelistXmlCollector $subject,
@@ -116,7 +118,7 @@ class AddCspPoliciesPlugin
         }
 
         if ($inline) {
-            $nonce = "'nonce-" . $this->nonceProvider->getNonce() . "'";
+            $nonce = $this->nonceProvider->generateNonce();
 
             if (!isset($policiesGrouped['script-src'])) {
                 $policiesGrouped['script-src'] = [
