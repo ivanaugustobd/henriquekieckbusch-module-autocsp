@@ -176,6 +176,7 @@ class AddCspPoliciesPlugin
                 $evalAllowed = $evalAllowed || $existingPolicy->isEvalAllowed();
                 $dynamicAllowed = $dynamicAllowed || $existingPolicy->isDynamicAllowed();
                 $eventHandlersAllowed = $eventHandlersAllowed || $existingPolicy->areEventHandlersAllowed();
+                $hashValues = $existingPolicy->getHashValues();
             }
 
             $newPolicy = $this->fetchPolicyFactory->create([
@@ -187,7 +188,7 @@ class AddCspPoliciesPlugin
                 'inlineAllowed' => $inlineAllowed,
                 'evalAllowed' => $evalAllowed,
                 'nonceValues' => array_unique($allNonceValues),
-                'hashValues' => [],
+                'hashValues' => $hashValues,
                 'dynamicAllowed' => $dynamicAllowed,
                 'eventHandlersAllowed' => $eventHandlersAllowed
             ]);
