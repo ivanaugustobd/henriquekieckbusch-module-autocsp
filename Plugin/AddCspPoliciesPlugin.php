@@ -176,7 +176,7 @@ class AddCspPoliciesPlugin
                 $evalAllowed = $evalAllowed || $existingPolicy->isEvalAllowed();
                 $dynamicAllowed = $dynamicAllowed || $existingPolicy->isDynamicAllowed();
                 $eventHandlersAllowed = $eventHandlersAllowed || $existingPolicy->areEventHandlersAllowed();
-                $hashValues = $existingPolicy->getHashValues();
+                $hashValues = $existingPolicy->getHashes() ?: [];
             }
 
             $newPolicy = $this->fetchPolicyFactory->create([
