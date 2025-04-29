@@ -82,7 +82,8 @@ class Policy extends AbstractFieldArray
             );
             $this->typeRenderer->setOptions([
                 ['value' => 'url', 'label' => __('URL')],
-                ['value' => 'host', 'label' => __('Host')]
+                ['value' => 'host', 'label' => __('Host')],
+                ['value' => 'hash', 'label' => __('Hash')]
             ]);
             $this->typeRenderer->setName($this->_getCellInputElementName('type'));
         }

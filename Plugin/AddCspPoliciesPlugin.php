@@ -96,7 +96,8 @@ class AddCspPoliciesPlugin
                     'id' => $policyId,
                     'hostSources' => [],
                     'schemeSources' => [],
-                    'nonceValues' => []
+                    'nonceValues' => [],
+                    'hashValues' => [],
                 ];
             }
 
@@ -109,6 +110,8 @@ class AddCspPoliciesPlugin
                 case 'scheme':
                     $policiesGrouped[$policyId]['schemeSources'][] = $dataContent;
                     break;
+                case 'hash':
+                    $policiesGrouped[$policyId]['hashValues'][] = $dataContent;
                 case 'url':
                 case 'host':
                 default:
@@ -151,6 +154,7 @@ class AddCspPoliciesPlugin
             $allHostSources = $policyData['hostSources'];
             $allSchemeSources = $policyData['schemeSources'];
             $allNonceValues = $policyData['nonceValues'];
+            $allHashValues = $policyData['hashValues'];
             $selfAllowed = false;
             $inlineAllowed = false;
             $evalAllowed = false;
@@ -171,12 +175,16 @@ class AddCspPoliciesPlugin
                     $allNonceValues,
                     $existingPolicy->getNonceValues() ?: []
                 );
+                $allHashValues = array_merge( // phpcs:ignore
+                    $allHashValues,
+                    $existingPolicy->getHashes() ?: []
+                );
                 $selfAllowed = $selfAllowed || $existingPolicy->isSelfAllowed();
                 $inlineAllowed = $inlineAllowed || $existingPolicy->isInlineAllowed();
                 $evalAllowed = $evalAllowed || $existingPolicy->isEvalAllowed();
                 $dynamicAllowed = $dynamicAllowed || $existingPolicy->isDynamicAllowed();
                 $eventHandlersAllowed = $eventHandlersAllowed || $existingPolicy->areEventHandlersAllowed();
-                $hashValues = $existingPolicy->getHashes() ?: [];
+                $hashValues = $allHashValues || $existingPolicy->getHashes();
             }
 
             $newPolicy = $this->fetchPolicyFactory->create([
