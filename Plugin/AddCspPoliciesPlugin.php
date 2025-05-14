@@ -156,7 +156,7 @@ class AddCspPoliciesPlugin
             $allHostSources = $policyData['hostSources'];
             $allSchemeSources = $policyData['schemeSources'];
             $allNonceValues = $policyData['nonceValues'];
-            $allHashValues = $policyData['hashValues'];
+            $allHashValues = array_key_exists('hashValues', $policyData) ? $policyData['hashValues'] : [];
             $selfAllowed = false;
             $inlineAllowed = false;
             $evalAllowed = false;

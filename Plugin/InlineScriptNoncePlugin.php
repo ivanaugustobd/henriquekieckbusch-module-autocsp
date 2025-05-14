@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace HenriqueKieckbusch\AutoCSP\Plugin;
@@ -14,7 +15,6 @@ class InlineScriptNoncePlugin
 {
     private const XML_PATH_MODULE_ENABLED = 'henrique_kieckbusch/autocsp/enabled';
     private const XML_PATH_INLINE = 'henrique_kieckbusch/autocsp/inline_scripts';
-    private const SCRIPT_PATTERN = '/<script(?![^>]*\bnonce=)([^>]*)>/i';
 
     /**
      * @var ScopeConfigInterface
@@ -49,7 +49,8 @@ class InlineScriptNoncePlugin
      */
     public function afterRenderResult(Page $subject, Layout $result, ResponseInterface $httpResponse)
     {
-        if (!$this->scopeConfig->isSetFlag(self::XML_PATH_MODULE_ENABLED) ||
+        if (
+            !$this->scopeConfig->isSetFlag(self::XML_PATH_MODULE_ENABLED) ||
             !$this->scopeConfig->isSetFlag(self::XML_PATH_INLINE)
         ) {
             return $result;
@@ -57,13 +58,23 @@ class InlineScriptNoncePlugin
 
         $content = $httpResponse->getContent();
         $nonce = $this->nonceProvider->generateNonce();
-        $httpResponse->setContent(
-            preg_replace(
-                self::SCRIPT_PATTERN,
-                '<script nonce="' . $nonce . '"$1>',
-                $content
-            )
-        );
+        $updatedContent = $content;
+
+        $dom = new \DOMDocument();
+        @$dom->loadHTML($content);
+
+        $scripts = $dom->getElementsByTagName('script');
+        foreach ($scripts as $script) {
+            $nonce = $script->getAttribute('nonce');
+            $parent = $script->parentNode;
+            $type = $parent->getAttribute('type');
+            if (!$nonce && $type !== 'text/x-magento-init') {
+                $script->setAttribute('nonce', $nonce);
+                $updatedContent = $dom->saveHTML();
+            }
+        }
+
+        $httpResponse->setContent($updatedContent);
         return $result;
     }
 }
