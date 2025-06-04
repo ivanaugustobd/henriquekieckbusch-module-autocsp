@@ -57,7 +57,7 @@ class InlineScriptNoncePlugin
         }
 
         $content = $httpResponse->getContent();
-        $nonce = $this->nonceProvider->generateNonce();
+        $nonceValue = $this->nonceProvider->generateNonce();
         $updatedContent = $content;
 
         $dom = new \DOMDocument();
@@ -69,7 +69,7 @@ class InlineScriptNoncePlugin
             $parent = $script->parentNode;
             $type = $parent->getAttribute('type');
             if (!$nonce && $type !== 'text/x-magento-init') {
-                $script->setAttribute('nonce', $nonce);
+                $script->setAttribute('nonce', $nonceValue);
                 $updatedContent = $dom->saveHTML();
             }
         }
