@@ -11,6 +11,8 @@ use Magento\Framework\View\Result\Page;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Csp\Helper\CspNonceProvider;
 
+use function PHPSTORM_META\type;
+
 class InlineScriptNoncePlugin
 {
     private const XML_PATH_MODULE_ENABLED = 'henrique_kieckbusch/autocsp/enabled';
@@ -67,7 +69,12 @@ class InlineScriptNoncePlugin
         foreach ($scripts as $script) {
             $nonce = $script->getAttribute('nonce');
             $type = $script->getAttribute('type');
-            if (!$nonce && $type !== 'text/x-magento-init' && $type !== 'text/x-custom-template') {
+            if (
+                !$nonce && 
+                $type !== 'text/x-magento-init' && 
+                $type !== 'text/x-custom-template' && 
+                $type !== 'text/x-magento-template'
+                ) {
                 $script->setAttribute('nonce', $nonceValue);
                 $updatedContent = $dom->saveHTML();
             }
