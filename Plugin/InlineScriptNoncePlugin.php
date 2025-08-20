@@ -61,14 +61,13 @@ class InlineScriptNoncePlugin
         $updatedContent = $content;
 
         $dom = new \DOMDocument();
-        @$dom->loadHTML($content);
+        @$dom->loadHTML($content, LIBXML_SCHEMA_CREATE);
 
         $scripts = $dom->getElementsByTagName('script');
         foreach ($scripts as $script) {
             $nonce = $script->getAttribute('nonce');
-            $parent = $script->parentNode;
-            $type = $parent->getAttribute('type');
-            if (!$nonce && $type !== 'text/x-magento-init') {
+            $type = $script->getAttribute('type');
+            if (!$nonce && $type !== 'text/x-magento-init' && $type !== 'text/x-custom-template') {
                 $script->setAttribute('nonce', $nonceValue);
                 $updatedContent = $dom->saveHTML();
             }
