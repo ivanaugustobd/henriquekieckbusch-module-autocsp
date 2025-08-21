@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace HenriqueKieckbusch\AutoCSP\Plugin;
@@ -73,7 +74,7 @@ class AddCspPoliciesPlugin
     public function afterCollect(
         CspWhitelistXmlCollector $subject,
         array $result
-    ) : array {
+    ): array {
         $enabled = $this->scopeConfig->isSetFlag(self::XML_PATH_MODULE_ENABLED);
         $inline = $this->scopeConfig->isSetFlag(self::XML_PATH_INLINE);
 
@@ -96,7 +97,8 @@ class AddCspPoliciesPlugin
                     'id' => $policyId,
                     'hostSources' => [],
                     'schemeSources' => [],
-                    'nonceValues' => []
+                    'nonceValues' => [],
+                    'hashValues' => [],
                 ];
             }
 
@@ -108,6 +110,9 @@ class AddCspPoliciesPlugin
                     break;
                 case 'scheme':
                     $policiesGrouped[$policyId]['schemeSources'][] = $dataContent;
+                    break;
+                case 'hash':
+                    $policiesGrouped[$policyId]['hashValues'][$dataContent] = 'sha256';
                     break;
                 case 'url':
                 case 'host':
@@ -151,6 +156,7 @@ class AddCspPoliciesPlugin
             $allHostSources = $policyData['hostSources'];
             $allSchemeSources = $policyData['schemeSources'];
             $allNonceValues = $policyData['nonceValues'];
+            $allHashValues = array_key_exists('hashValues', $policyData) ? $policyData['hashValues'] : [];
             $selfAllowed = false;
             $inlineAllowed = false;
             $evalAllowed = false;
@@ -159,17 +165,21 @@ class AddCspPoliciesPlugin
 
             foreach ($existingPolicies as $existingPolicyData) {
                 $existingPolicy = $existingPolicyData['policy'];
-                $allHostSources = array_merge(// phpcs:ignore
+                $allHostSources = array_merge( // phpcs:ignore
                     $allHostSources,
                     $existingPolicy->getHostSources() ?: []
                 );
-                $allSchemeSources = array_merge(// phpcs:ignore
+                $allSchemeSources = array_merge( // phpcs:ignore
                     $allSchemeSources,
                     $existingPolicy->getSchemeSources() ?: []
                 );
-                $allNonceValues = array_merge(// phpcs:ignore
+                $allNonceValues = array_merge( // phpcs:ignore
                     $allNonceValues,
                     $existingPolicy->getNonceValues() ?: []
+                );
+                $allHashValues = array_merge( // phpcs:ignore
+                    $allHashValues,
+                    $existingPolicy->getHashes() ?: []
                 );
                 $selfAllowed = $selfAllowed || $existingPolicy->isSelfAllowed();
                 $inlineAllowed = $inlineAllowed || $existingPolicy->isInlineAllowed();
@@ -187,7 +197,7 @@ class AddCspPoliciesPlugin
                 'inlineAllowed' => $inlineAllowed,
                 'evalAllowed' => $evalAllowed,
                 'nonceValues' => array_unique($allNonceValues),
-                'hashValues' => [],
+                'hashValues' => $allHashValues,
                 'dynamicAllowed' => $dynamicAllowed,
                 'eventHandlersAllowed' => $eventHandlersAllowed
             ]);
@@ -210,7 +220,7 @@ class AddCspPoliciesPlugin
      * @param string $policyId
      * @return string
      */
-    private function mapPolicyType(string $policyId) : string
+    private function mapPolicyType(string $policyId): string
     {
         $mapping = [
             'script-src-elem' => 'script-src',
