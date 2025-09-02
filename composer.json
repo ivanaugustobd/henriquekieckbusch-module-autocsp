@@ -6,7 +6,6 @@
     "magento/module-csp": "*"
   },
   "type": "magento2-module",
-  "version": "1.0.1",
   "autoload": {
     "files": [
       "registration.php"
