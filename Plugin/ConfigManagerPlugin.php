@@ -1,10 +1,10 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace HenriqueKieckbusch\AutoCSP\Plugin;
 
 use Magento\Csp\Api\Data\ModeConfiguredInterface;
 use Magento\Csp\Model\Mode\ConfigManager;
+use Magento\Csp\Model\Mode\Data\ModeConfigured;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\UrlInterface;
 
@@ -14,63 +14,42 @@ class ConfigManagerPlugin
     private const XML_PATH_MODULE_ENABLED = 'henrique_kieckbusch/autocsp/enabled';
 
     /**
-     * @var ScopeConfigInterface
+     * Overriden result if this module is enabled and capture mode is on
+     *
+     * @var ModeConfiguredInterface
      */
-    private ScopeConfigInterface $scopeConfig;
+    private readonly ModeConfiguredInterface $modeConfigured;
 
-    /**
-     * @var UrlInterface
-     */
-    private UrlInterface $urlBuilder;
-
-    /**
-     * @var null
-     */
-    private static $reflectionCache = null;
-
-    /**
-     * @param ScopeConfigInterface $scopeConfig
-     * @param UrlInterface $urlBuilder
-     */
+    // phpcs:ignore
     public function __construct(
-        ScopeConfigInterface $scopeConfig,
-        UrlInterface $urlBuilder
+        private readonly ScopeConfigInterface $scopeConfig,
+        private readonly UrlInterface $urlBuilder,
     ) {
-        $this->scopeConfig = $scopeConfig;
-        $this->urlBuilder = $urlBuilder;
     }
 
     /**
-     * Let's update the reportOnly and reportUri properties
+     * Update the reportOnly and reportUri properties
      *
      * @param ConfigManager $subject
      * @param ModeConfiguredInterface $result
      * @return ModeConfiguredInterface
-     * @throws \ReflectionException
      */
     public function afterGetConfigured(
         ConfigManager $subject,
         ModeConfiguredInterface $result
     ) : ModeConfiguredInterface {
-        if (!$this->scopeConfig->isSetFlag(self::XML_PATH_MODULE_ENABLED)
-        ) {
-            return $result;
+        if (isset($this->modeConfigured)) {
+            return $this->modeConfigured;
         }
 
-        if (self::$reflectionCache === null) {
-            self::$reflectionCache = new \ReflectionClass($result);
-        }
+        $isAutoCspEnabled = $this->scopeConfig->isSetFlag(self::XML_PATH_MODULE_ENABLED);
+        $isCaptureModeEnabled = $this->scopeConfig->isSetFlag(self::XML_PATH_CAPTURE);
 
-        $reportOnlyProperty = self::$reflectionCache->getProperty('reportOnly');
-        $reportOnlyProperty->setAccessible(true);
-        $reportOnlyProperty->setValue($result, $this->scopeConfig->isSetFlag(self::XML_PATH_CAPTURE));
+        $this->modeConfigured = !$isAutoCspEnabled || !$isCaptureModeEnabled ? $result : new ModeConfigured(
+            $isCaptureModeEnabled,
+            $this->urlBuilder->getUrl('autocsp/report/index'),
+        );
 
-        if ($this->scopeConfig->isSetFlag(self::XML_PATH_CAPTURE)) {
-            $reportUriProperty = self::$reflectionCache->getProperty('reportUri');
-            $reportUriProperty->setAccessible(true);
-            $reportUriProperty->setValue($result, $this->urlBuilder->getUrl('autocsp/report/index'));
-        }
-
-        return $result;
+        return $this->modeConfigured;
     }
 }
